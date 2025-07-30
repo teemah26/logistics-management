@@ -11,17 +11,23 @@ class VehicleCategory(models.Model):
         return self.name
     
 class Vehicle(models.Model):
-    name = models.CharField(max_length=100, blank=False, default="")
-    category = models.ForeignKey(VehicleCategory, on_delete=models.CASCADE)
-    license_number = models.CharField(max_length=100, blank=False, default="", unique=True)
+    name = models.CharField(max_length=250,unique=True)
+    vehicle_category = models.ForeignKey(VehicleCategory, related_name='deliverySystem',on_delete=models.CASCADE)
+    license_number = models.CharField(max_length=100, unique=True)
     added_date = models.DateTimeField(auto_now_add=True)
     in_use = models.BooleanField(default=True)
 
+    owner = models.ForeignKey(
+           'auth.User',
+           null=True,
+           related_name='deliverySystem',
+           on_delete=models.CASCADE
+    )
+        
     class Meta:
-        ordering = ('license_number',)
-
+            ordering = ('name',)
     def __str__(self):
-        return f"{self.vehicle_number} - {self.category.name}"
+            return self.name
     
 class Driver(models.Model):
     MALE = 'M'
@@ -30,10 +36,17 @@ class Driver(models.Model):
     (MALE,'Male'),
     (FEMALE,'Female'),
     )
-    name = models.CharField(max_length=100, blank=False, default="")
-    mission_completed = models.IntegerField(default=0)
+    name = models.CharField(max_length=100, blank=False, default='',unique=True)
+    mission_completed = models.IntegerField()
     gender= models.CharField(max_length=2,choices=GENDER_CHOICES,default=MALE)
     hired_on = models.DateTimeField(auto_now_add=True)
+
+    owner = models.ForeignKey(
+           'auth.User',
+           null=True,
+           related_name='drivers',
+           on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ('name',)
@@ -50,5 +63,3 @@ class DeliveryMission(models.Model):
     class Meta:
         ordering = ('destination',)
 
-    def __str__(self):
-        return f"Mission {self.id} by {self.driver.name} using {self.vehicle.name}"

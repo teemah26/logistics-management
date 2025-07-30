@@ -100,10 +100,12 @@ class DriverList(generics.ListCreateAPIView):
     ordering_fields = [
         'name',
         'mission_completed',]
-    authentication_classes = (TokenAuthentication,
-                              )
-    permission_classes=(
-        IsAuthenticated
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        custompermission.IsCurrentUserOrReadOnly,
     )
 class DriverDetail(generics.RetrieveUpdateDestroyAPIView):
     throttle_scope ='anon'
@@ -145,8 +147,8 @@ class ApiRoot(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return Response({
             'vehicle-categiries': reverse(VehicleCategoryList.name, request=request),
-            'drones': reverse(VehicleList.name, request=request),
-            'pilots': reverse(DriverList.name, request=request),
-            'competitions': reverse(DeliveryMissionList.name, request=request),
+            'vehicle': reverse(VehicleList.name, request=request),
+            'driver': reverse(DriverList.name, request=request),
+            'deliveryMission': reverse(DeliveryMissionList.name, request=request),
         })
 

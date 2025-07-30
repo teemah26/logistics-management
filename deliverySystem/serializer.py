@@ -7,10 +7,10 @@ import deliverySystem.views
 from django.contrib.auth.models import User
 
 class VehicleCategorySerializer(serializers.HyperlinkedModelSerializer):
-    drones = serializers.HyperlinkedRelatedField(
+    deliverySystem = serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
-        view_name='drone-detail'
+        view_name='vehicle-detail'
     )
     class Meta:
         model=VehicleCategory
@@ -18,7 +18,7 @@ class VehicleCategorySerializer(serializers.HyperlinkedModelSerializer):
             'url',
             'pk',
             'name',
-            'vehicle'
+            'deliverySystem'
         )
 
 class VehicleSerializer(serializers.HyperlinkedModelSerializer):
@@ -35,7 +35,6 @@ class VehicleSerializer(serializers.HyperlinkedModelSerializer):
             'license_number',
             'in_use',
           
-
         )
 class DeliveryMissionSerializer(serializers.HyperlinkedModelSerializer):
     vehicle =VehicleSerializer()
@@ -46,8 +45,8 @@ class DeliveryMissionSerializer(serializers.HyperlinkedModelSerializer):
             'pk',
             'destination',
             'distance_km',
-            'vehicle'
-            'delivery_date'
+            'vehicle',
+            'delivery_date',
             'driver'
         )        
 
@@ -62,11 +61,27 @@ class DriverSerializer(serializers.HyperlinkedModelSerializer):
             'url',
             'name',
             'gender',
+            'gender_description',
             'mission_completed',
             'hired_on',
+            'DeliveryMissions'
             
         )
 class DeliveryMissionSerializer(serializers.ModelSerializer):
+    
+    vehicle=VehicleSerializer()
+    class Meta:
+        model = DeliveryMission
+        fields=(
+            'url',
+            'pk',
+            'distance_km',
+            'delivery_date',
+            'vehicle'
+        )        
+  
+        
+class DriverDeliveryMissionSerializer(serializers.ModelSerializer):
     driver=serializers.SlugRelatedField(queryset=Driver.objects.all(),slug_field='name')
     vehicle=serializers.SlugRelatedField(queryset=Vehicle.objects.all(),slug_field='name')
     class Meta:
@@ -77,8 +92,7 @@ class DeliveryMissionSerializer(serializers.ModelSerializer):
             'distance_km',
             'driver',
             'vehicle',
-            'delivery_date',
-            'destination'
+            
         )
 
 class UserVehicleSerializer(serializers.HyperlinkedModelSerializer):
@@ -89,7 +103,7 @@ class UserVehicleSerializer(serializers.HyperlinkedModelSerializer):
             'name'
             )
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    vehicles=UserVehicleSerializer(
+    deliverySystem=UserVehicleSerializer(
         many=True,
         read_only=True
     ) 

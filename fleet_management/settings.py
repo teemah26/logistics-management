@@ -90,6 +90,8 @@ WSGI_APPLICATION = 'fleet_management.wsgi.application'
 #         'PORT': '5432',
 #     }
 # }
+ALLOWED_HOSTS = ['*']
+
 
 DATABASES = {
     'default': {
